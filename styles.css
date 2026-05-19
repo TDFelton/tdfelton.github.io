@@ -5,17 +5,17 @@
 
 /* ---------- Tokens ---------- */
 :root {
-  --paper: #f5f1ea;          /* cream / newsprint */
-  --paper-deep: #ebe5d8;     /* slightly darker paper */
-  --ink: #121212;            /* near-black */
-  --ink-soft: #2a2a2a;
-  --ink-mid: #4a4a4a;
-  --ink-muted: #6e6960;
-  --rule: #d8d1c0;
-  --accent: #1e3a5f;         /* deep navy — editorial, confident */
+  --paper: #ece8f0;          /* light lavender — tinted paper */
+  --paper-deep: #dfd8e8;     /* slightly deeper lavender */
+  --ink: #1a2540;            /* deep navy panels */
+  --ink-soft: #2a2540;       /* prose / strong text */
+  --ink-mid: #4a4560;        /* secondary text */
+  --ink-muted: #6e6680;      /* metadata / muted */
+  --rule: #c8bfd4;           /* lavender borders */
+  --accent: #1e3a5f;         /* deep navy — editorial accent on light bg */
   --accent-deep: #14283f;
-  --accent-light: #7ba3d4;   /* lighter navy/sky — for use on dark backgrounds */
-  --link: #5b4a7a;           /* muted violet — secondary accent for links */
+  --accent-light: #9bb8e0;   /* sky-tinted navy — for use on dark navy panels */
+  --link: #5b4a7a;           /* muted violet */
   --link-hover: #3d3055;
 
   --font-display: "Fraunces", "Times New Roman", Georgia, serif;
@@ -88,7 +88,7 @@ a:focus-visible {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(245, 241, 234, 0.92);
+  background: rgba(236, 232, 240, 0.92);
   backdrop-filter: saturate(140%) blur(8px);
   -webkit-backdrop-filter: saturate(140%) blur(8px);
   border-bottom: 1px solid var(--rule);
@@ -366,7 +366,7 @@ a:focus-visible {
   border-top: 1px solid var(--ink);
 }
 .section-ink .section-title { color: var(--paper); }
-.section-ink .prose { color: #d8d2c4; }
+.section-ink .prose { color: #d4cde0; }
 .section-ink a { color: #b3a7d4; }
 .section-ink a:hover { color: var(--paper); }
 
@@ -415,7 +415,7 @@ a:focus-visible {
 /* ---------- Experience entries ---------- */
 .entry {
   padding: 1.75rem 0 1.75rem;
-  border-bottom: 1px solid rgba(216, 209, 192, 0.25);
+  border-bottom: 1px solid rgba(212, 205, 224, 0.25);
 }
 .section-paper .entry { border-bottom-color: var(--rule); }
 .entry:first-child { padding-top: 0; }
@@ -438,7 +438,7 @@ a:focus-visible {
   margin: 0 0 .15rem;
   color: var(--ink-soft);
 }
-.section-ink .entry-org { color: #d8d2c4; }
+.section-ink .entry-org { color: #d4cde0; }
 .entry-meta {
   font-family: var(--font-mono);
   font-size: .78rem;
@@ -447,7 +447,7 @@ a:focus-visible {
   color: var(--ink-muted);
   margin: 0;
 }
-.section-ink .entry-meta { color: #a8a194; }
+.section-ink .entry-meta { color: #9b94ad; }
 
 .entry-bullets {
   list-style: none;
@@ -463,7 +463,7 @@ a:focus-visible {
   color: var(--ink-soft);
   max-width: 64ch;
 }
-.section-ink .entry-bullets li { color: #d8d2c4; }
+.section-ink .entry-bullets li { color: #d4cde0; }
 .entry-bullets li:last-child { margin-bottom: 0; }
 .entry-bullets li::before {
   content: "";
@@ -556,7 +556,7 @@ a:focus-visible {
 /* ---------- Skills ---------- */
 .skill-block {
   padding: 1.1rem 0;
-  border-bottom: 1px solid rgba(216, 209, 192, 0.18);
+  border-bottom: 1px solid rgba(212, 205, 224, 0.18);
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 1.5rem;
@@ -580,7 +580,7 @@ a:focus-visible {
 .skill-list {
   font-size: .98rem;
   line-height: 1.7;
-  color: #d8d2c4;
+  color: #d4cde0;
   margin: 0;
 }
 
@@ -640,7 +640,7 @@ a:focus-visible {
   grid-template-columns: 110px 1fr;
   gap: 1rem;
   padding-bottom: .85rem;
-  border-bottom: 1px solid rgba(216, 209, 192, 0.2);
+  border-bottom: 1px solid rgba(212, 205, 224, 0.2);
   font-size: 1rem;
 }
 .contact-list li:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -649,16 +649,16 @@ a:focus-visible {
   font-size: .72rem;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #a8a194;
+  color: #9b94ad;
   align-self: center;
 }
 
 /* ---------- Footer ---------- */
 .site-footer {
   background: var(--ink);
-  color: #a8a194;
+  color: #9b94ad;
   padding: 2rem 0;
-  border-top: 1px solid #2a2a2a;
+  border-top: 1px solid #2a3550;
 }
 .footer-row {
   display: flex;
