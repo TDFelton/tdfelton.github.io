@@ -12,10 +12,11 @@
   --ink-mid: #4a4a4a;
   --ink-muted: #6e6960;
   --rule: #d8d1c0;
-  --accent: #a8331f;         /* brick red — Statcast-adjacent without being literal */
-  --accent-deep: #7a2415;
-  --link: #2d4a6b;           /* muted slate-blue */
-  --link-hover: #1a3251;
+  --accent: #1e3a5f;         /* deep navy — editorial, confident */
+  --accent-deep: #14283f;
+  --accent-light: #7ba3d4;   /* lighter navy/sky — for use on dark backgrounds */
+  --link: #5b4a7a;           /* muted violet — secondary accent for links */
+  --link-hover: #3d3055;
 
   --font-display: "Fraunces", "Times New Roman", Georgia, serif;
   --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -313,6 +314,16 @@ a:focus-visible {
   text-transform: uppercase;
   color: var(--ink-muted);
 }
+.photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 20%;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--ink-soft);
+  filter: saturate(.95);
+}
 
 .quick-facts {
   margin: 0;
@@ -355,9 +366,8 @@ a:focus-visible {
   border-top: 1px solid var(--ink);
 }
 .section-ink .section-title { color: var(--paper); }
-.section-ink .section-num { color: var(--accent); }
 .section-ink .prose { color: #d8d2c4; }
-.section-ink a { color: #e8a59a; }
+.section-ink a { color: #b3a7d4; }
 .section-ink a:hover { color: var(--paper); }
 
 .two-col {
@@ -462,6 +472,8 @@ a:focus-visible {
   width: 14px; height: 1.5px;
   background: var(--accent);
 }
+.section-ink .entry-bullets li::before { background: var(--accent-light); }
+.section-ink .section-num { color: var(--accent-light); }
 
 /* ---------- Projects ---------- */
 .project {
