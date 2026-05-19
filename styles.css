@@ -522,6 +522,12 @@ a:focus-visible {
   background: var(--accent);
   color: var(--paper);
 }
+.badge-shipped {
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  padding: calc(.25rem - 1.5px) calc(.55rem - 1.5px);
+}
 
 .tag-row {
   list-style: none;
