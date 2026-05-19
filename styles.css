@@ -184,7 +184,7 @@ a:focus-visible {
   display: grid;
   grid-template-columns: 1.55fr 1fr;
   gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
+  align-items: start;
   position: relative;
 }
 @media (max-width: 880px) {
@@ -315,11 +315,11 @@ a:focus-visible {
   color: var(--ink-muted);
 }
 .photo {
+  display: block;
   width: 100%;
-  height: auto;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center 22%;
   margin-bottom: 1.25rem;
   border: 1px solid var(--ink-soft);
   filter: saturate(.95);
