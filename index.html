@@ -225,6 +225,50 @@
 
           <article class="project">
             <div class="project-head">
+              <h3 class="project-title">Free-Agent Contract Valuation Model</h3>
+              <span class="badge badge-shipped">Complete · Personal</span>
+            </div>
+            <p class="project-tagline">A front-office-style surplus-value model for an online baseball simulation league — valuing players and pricing the market as two independent problems.</p>
+            <p class="prose">
+              A model that recommends a single contract — years and average annual value (AAV) — for any free agent in
+              <em>Frostfire</em>, a long-running online <abbr title="Out of the Park Baseball">OOTP</abbr> simulation
+              league with 21 seasons of data. The design mirrors how real front offices think: estimate what a player
+              is <em>worth</em> and what the market will <em>pay</em> as two independent models, then recommend a
+              signing only when value clears price by enough margin to absorb projection risk. I built it through
+              directed, end-to-end AI-assisted development — supplying the domain knowledge, modeling decisions, and
+              validation judgment while iterating the implementation through conversation with an AI coding assistant.
+            </p>
+            <p class="prose">
+              Value is assembled bottom-up: box-score stats are park-neutralized, decomposed into components (power,
+              contact, baserunning, defense, and catcher framing), converted to runs above replacement using linear
+              weights fit from the league&apos;s own run environment, aged forward with delta-method curves fit per
+              position and component, then run through a 40,000-iteration Monte Carlo that separates true-talent
+              uncertainty from season-to-season luck before pricing on a convex dollars-per-run curve. Price is a
+              deliberately simple ridge regression on real signings, and a length optimizer picks the contract that
+              maximizes risk-adjusted surplus — or recommends not signing at all. I excluded an available
+              player-ratings access token by choice: using information other managers couldn&apos;t see would be
+              cheating, not analytics.
+            </p>
+            <p class="prose">
+              On 280 held-out signings the market model reached an R² of 0.568 but cleared my pre-committed accuracy
+              bar — 85% of deals within ±15% of actual AAV — just 18.6% of the time. Rather than lower the target, I
+              diagnosed the gap: three independent rounds of experiments (gradient boosting, robust regression, added
+              features, and more training data) all failed to beat the simple baseline on held-out data. With no
+              scouting or player-ratings data exposed by the league and only ~250–280 unbiased signings to learn from,
+              the ceiling was structural — a limit of the available data, not the architecture. Identifying that
+              distinction, rather than chasing a number, was the real result.
+            </p>
+            <ul class="tag-row" aria-label="Methods and tools">
+              <li>Python</li><li>Surplus-value modeling</li><li>Monte Carlo simulation</li>
+              <li>Ridge regression</li><li>Sabermetrics</li><li>StatsPlus API</li><li>AI-assisted (Claude)</li>
+            </ul>
+            <p class="project-links">
+              <a href="https://github.com/TDFelton/ootp26_free_agent_analysis" target="_blank" rel="noopener">GitHub →</a>
+            </p>
+          </article>
+
+          <article class="project">
+            <div class="project-head">
               <h3 class="project-title">Computational Modeling of T₂ Relaxation via Single-Sided NMR</h3>
               <span class="badge badge-active">Manuscript in prep</span>
             </div>
