@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stuff+ Leaderboards — Thomas Felton</title>
+  <meta name="description" content="Per-pitch-type Stuff+ leaderboards from Thomas Felton's MLB pitch-quality model, benchmarked against FanGraphs Stuff+ (2025)." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f5f1ea'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='40' font-weight='700' text-anchor='middle' fill='%23121212'%3ETF%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+  :root {
+    --paper:#ece8f0; --paper-deep:#dfd8e8; --ink:#1a2540; --ink-soft:#2a2540;
+    --ink-mid:#4a4560; --ink-muted:#6e6680; --rule:#c8bfd4; --accent:#1e3a5f;
+    --accent-light:#9bb8e0; --link:#5b4a7a; --link-hover:#3d3055;
+    --font-display:"Fraunces","Times New Roman",Georgia,serif;
+    --font-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --container:1100px;
+  }
+  *,*::before,*::after { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; font-family:var(--font-body); font-size:16px; line-height:1.6;
+    color:var(--ink); background:var(--paper); -webkit-font-smoothing:antialiased; }
+  a { color:var(--link); text-decoration:none; border-bottom:1px solid transparent; transition:color .15s,border-color .15s; }
+  a:hover { color:var(--link-hover); border-bottom-color:currentColor; }
+  .wrap { max-width:var(--container); margin:0 auto; padding:0 clamp(1.25rem,4vw,2.5rem); }
+  .lb-top { border-bottom:1px solid var(--rule); background:rgba(236,232,240,.92); position:sticky; top:0; z-index:20; backdrop-filter:saturate(140%) blur(8px); }
+  .lb-top .wrap { display:flex; align-items:center; justify-content:space-between; padding-top:.9rem; padding-bottom:.9rem; gap:1rem; }
+  .lb-back { font-family:var(--font-mono); font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); border-bottom:0; }
+  .lb-back:hover { color:var(--ink); }
+  .lb-brand { font-family:var(--font-display); font-weight:600; font-size:1rem; color:var(--ink); }
+  header.lb-hero { padding:clamp(2.5rem,6vw,4.5rem) 0 1.5rem; }
+  .lb-eyebrow { font-family:var(--font-mono); font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-muted); margin:0 0 1rem; }
+  h1.lb-title { font-family:var(--font-display); font-weight:600; font-size:clamp(2.2rem,5vw,3.4rem); line-height:1.02; letter-spacing:-.02em; margin:0 0 1rem; }
+  .lb-lede { font-family:var(--font-display); font-size:clamp(1.05rem,1.6vw,1.25rem); color:var(--ink-soft); max-width:60ch; margin:0 0 1.25rem; line-height:1.5; }
+  .lb-note { font-size:.92rem; color:var(--ink-mid); max-width:70ch; margin:.75rem 0 0; }
+  .lb-note strong { color:var(--ink-soft); }
+  .lb-tabs { display:flex; flex-wrap:wrap; gap:.5rem; margin:2rem 0 1.5rem; border-bottom:1px solid var(--rule); padding-bottom:1.25rem; }
+  .lb-tab { font-family:var(--font-body); font-size:.9rem; font-weight:500; color:var(--ink-soft); background:var(--paper-deep);
+    border:1px solid var(--rule); border-radius:2px; padding:.55rem .9rem; cursor:pointer; transition:all .15s; letter-spacing:.01em; }
+  .lb-tab:hover { border-color:var(--accent); color:var(--ink); }
+  .lb-tab.is-active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .lb-tab-abbr { font-family:var(--font-mono); font-size:.72rem; opacity:.7; margin-left:.25rem; }
+  .lb-panel-head { margin:0 0 1rem; }
+  .lb-panel-head h2 { font-family:var(--font-display); font-style:italic; font-weight:500; font-size:1.7rem; margin:0 0 .25rem; color:var(--ink); }
+  .lb-abbr { font-style:normal; color:var(--ink-muted); font-size:1.1rem; }
+  .lb-corr { font-family:var(--font-mono); font-size:.82rem; color:var(--accent); margin:0; letter-spacing:.02em; }
+  .lb-scroll { overflow-x:auto; border:1px solid var(--rule); border-radius:3px; background:#fff; }
+  .lb-table { width:100%; border-collapse:collapse; font-size:.9rem; min-width:640px; }
+  .lb-table th, .lb-table td { padding:.6rem .7rem; text-align:right; white-space:nowrap; }
+  .lb-table th.c-name, .lb-table td.c-name { text-align:left; }
+  .lb-table th.c-rk, .lb-table td.c-rk { text-align:center; color:var(--ink-muted); font-family:var(--font-mono); width:2.5rem; }
+  .lb-grp th { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; font-weight:500;
+    color:var(--ink-muted); padding-bottom:.3rem; border-bottom:1px solid var(--rule); text-align:center; }
+  .lb-grp .grp-mine { color:var(--accent); }
+  .lb-grp .grp-fg { color:var(--ink-mid); }
+  .lb-grp .grp-perf { color:var(--ink-mid); }
+  .lb-sub th { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; color:var(--ink-soft); font-weight:500;
+    border-bottom:1.5px solid var(--ink); padding-top:.4rem; }
+  .lb-table tbody tr { border-bottom:1px solid #eee; }
+  .lb-table tbody tr:nth-child(odd) { background:#faf9fc; }
+  .lb-table tbody tr:hover { background:var(--paper-deep); }
+  .c-name { font-weight:500; color:var(--ink); }
+  .c-our { font-weight:600; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .c-fg { font-variant-numeric:tabular-nums; }
+  .c-sub { color:var(--ink-muted); font-size:.82rem; font-family:var(--font-mono); }
+  .lb-table td { font-variant-numeric:tabular-nums; }
+  .dag { color:var(--accent); }
+  .lb-legend { margin:1.25rem 0 0; font-size:.85rem; color:var(--ink-mid); line-height:1.7; }
+  .lb-legend code { font-family:var(--font-mono); font-size:.82rem; color:var(--ink-soft); }
+  footer.lb-foot { margin-top:3.5rem; border-top:1px solid var(--rule); padding:1.75rem 0 3rem; font-family:var(--font-mono); font-size:.78rem; color:var(--ink-muted); }
+  footer.lb-foot a { color:var(--ink-soft); }
+  @media (max-width:640px) {
+    .lb-title { font-size:2rem; }
+    .lb-brand { display:none; }
+  }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  </style>
+</head>
+<body>
+  <div class="lb-top">
+    <div class="wrap">
+      <a class="lb-back" href="index.html">← Back to portfolio</a>
+      <span class="lb-brand">Thomas Felton</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="lb-hero">
+      <p class="lb-eyebrow">Stuff+ · Per-pitch-type model · MLB / Statcast</p>
+      <h1 class="lb-title">Stuff+ Leaderboards</h1>
+      <p class="lb-lede">Top pitchers by my model's 2025 Stuff+ grade, benchmarked pitch-by-pitch against
+      FanGraphs' Stuff+. Grades reflect physical pitch characteristics only — velocity, movement, spin,
+      release, and approach angle — independent of location, count, and batter handedness. 100 = MLB average.</p>
+      <p class="lb-note"><strong>Reading this page:</strong> each pitcher is ranked by my model's grade for that
+      pitch type. FanGraphs' grade and rank are shown alongside for comparison. The right-hand block is the pitcher's
+      actual 2026-season performance, for context on whether the grade is holding up.</p>
+    </header>
+
+    <div class="lb-tabs" role="tablist" aria-label="Pitch type">
+        <button class="lb-tab is-active" role="tab" aria-selected="true" aria-controls="panel-FF" id="tab-FF" data-target="panel-FF">Four-Seam <span class="lb-tab-abbr">FF</span></button>
+        <button class="lb-tab" role="tab" aria-selected="false" aria-controls="panel-CH" id="tab-CH" data-target="panel-CH">Changeup <span class="lb-tab-abbr">CH</span></button>
+        <button class="lb-tab" role="tab" aria-selected="false" aria-controls="panel-SL" id="tab-SL" data-target="panel-SL">Slider <span class="lb-tab-abbr">SL</span></button>
+        <button class="lb-tab" role="tab" aria-selected="false" aria-controls="panel-FS" id="tab-FS" data-target="panel-FS">Splitter <span class="lb-tab-abbr">FS</span></button>
+    </div>
+
+<section class="lb-panel" id="panel-FF" role="tabpanel" aria-labelledby="tab-FF">
+      <div class="lb-panel-head">
+        <h2>Four-Seam <span class="lb-abbr">(FF)</span></h2>
+        <p class="lb-corr">Spearman ρ = 0.758 vs FanGraphs · n = 338 pitchers</p>
+      </div>
+      <div class="lb-scroll">
+      <table class="lb-table">
+        <thead>
+          <tr class="lb-grp">
+            <th></th><th></th>
+            <th colspan="2" class="grp-mine">My Stuff+ · 2025</th>
+            <th colspan="2" class="grp-fg">FanGraphs · 2025</th>
+            <th colspan="4" class="grp-perf">2026 season</th>
+          </tr>
+          <tr class="lb-sub">
+            <th class="c-rk">#</th><th class="c-name">Pitcher</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>IP</th><th>ERA</th><th>Wh%<span class="dag">†</span></th><th>xwOBAcon<span class="dag">†</span></th>
+          </tr>
+        </thead>
+        <tbody>
+<tr><td class="c-rk">1</td><td class="c-name">Mason Miller</td><td class="c-our">109.3</td><td class="c-sub">1</td><td class="c-fg">120</td><td class="c-sub">4</td><td>51.3</td><td>0.88</td><td>37.4%</td><td>0.329</td></tr>
+<tr><td class="c-rk">2</td><td class="c-name">Jacob Misiorowski</td><td class="c-our">109.1</td><td class="c-sub">2</td><td class="c-fg">122</td><td class="c-sub">2</td><td>139.0</td><td>1.75</td><td>39.0%</td><td>0.351</td></tr>
+<tr><td class="c-rk">3</td><td class="c-name">Tim Hill</td><td class="c-our">107.6</td><td class="c-sub">3</td><td class="c-fg">110</td><td class="c-sub">44</td><td>47.7</td><td>4.53</td><td>26.3%</td><td>0.529</td></tr>
+<tr><td class="c-rk">4</td><td class="c-name">Edwin Díaz</td><td class="c-our">107.0</td><td class="c-sub">4</td><td class="c-fg">113</td><td class="c-sub">30</td><td>13.7</td><td>11.85</td><td>16.4%</td><td>0.434</td></tr>
+<tr><td class="c-rk">5</td><td class="c-name">Elvis Alvarado</td><td class="c-our">106.6</td><td class="c-sub">5</td><td class="c-fg">113</td><td class="c-sub">30</td><td>38.7</td><td>4.66</td><td>31.2%</td><td>0.461</td></tr>
+<tr><td class="c-rk">6</td><td class="c-name">Grant Anderson</td><td class="c-our">106.5</td><td class="c-sub">6</td><td class="c-fg">114</td><td class="c-sub">23</td><td>49.3</td><td>3.65</td><td>20.5%</td><td>0.334</td></tr>
+<tr><td class="c-rk">7</td><td class="c-name">Jeremiah Estrada</td><td class="c-our">106.5</td><td class="c-sub">7</td><td class="c-fg">117</td><td class="c-sub">12</td><td>29.3</td><td>3.38</td><td>26.6%</td><td>0.358</td></tr>
+<tr><td class="c-rk">8</td><td class="c-name">Mason Montgomery</td><td class="c-our">105.2</td><td class="c-sub">8</td><td class="c-fg">119</td><td class="c-sub">7</td><td>48.3</td><td>3.54</td><td>27.6%</td><td>0.373</td></tr>
+<tr><td class="c-rk">9</td><td class="c-name">Zack Wheeler</td><td class="c-our">104.0</td><td class="c-sub">9</td><td class="c-fg">117</td><td class="c-sub">12</td><td>115.3</td><td>2.89</td><td>25.7%</td><td>0.339</td></tr>
+<tr><td class="c-rk">10</td><td class="c-name">Aroldis Chapman</td><td class="c-our">103.9</td><td class="c-sub">10</td><td class="c-fg">114</td><td class="c-sub">23</td><td>40.7</td><td>1.99</td><td>17.1%</td><td>0.381</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+<section class="lb-panel" id="panel-CH" role="tabpanel" aria-labelledby="tab-CH" hidden>
+      <div class="lb-panel-head">
+        <h2>Changeup <span class="lb-abbr">(CH)</span></h2>
+        <p class="lb-corr">Spearman ρ = 0.660 vs FanGraphs · n = 167 pitchers</p>
+      </div>
+      <div class="lb-scroll">
+      <table class="lb-table">
+        <thead>
+          <tr class="lb-grp">
+            <th></th><th></th>
+            <th colspan="2" class="grp-mine">My Stuff+ · 2025</th>
+            <th colspan="2" class="grp-fg">FanGraphs · 2025</th>
+            <th colspan="4" class="grp-perf">2026 season</th>
+          </tr>
+          <tr class="lb-sub">
+            <th class="c-rk">#</th><th class="c-name">Pitcher</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>IP</th><th>ERA</th><th>Wh%<span class="dag">†</span></th><th>xwOBAcon<span class="dag">†</span></th>
+          </tr>
+        </thead>
+        <tbody>
+<tr><td class="c-rk">1</td><td class="c-name">Devin Williams</td><td class="c-our">120.5</td><td class="c-sub">1</td><td class="c-fg">124</td><td class="c-sub">5</td><td>38.7</td><td>4.66</td><td>38.2%</td><td>0.339</td></tr>
+<tr><td class="c-rk">2</td><td class="c-name">Cristopher Sánchez</td><td class="c-our">120.0</td><td class="c-sub">2</td><td class="c-fg">129</td><td class="c-sub">3</td><td>161.7</td><td>2.51</td><td>45.7%</td><td>0.282</td></tr>
+<tr><td class="c-rk">3</td><td class="c-name">Blake Snell</td><td class="c-our">119.5</td><td class="c-sub">3</td><td class="c-fg">106</td><td class="c-sub">28</td><td>15.0</td><td>3.60</td><td>36.8%</td><td>0.400</td></tr>
+<tr><td class="c-rk">4</td><td class="c-name">Griffin Jax</td><td class="c-our">117.8</td><td class="c-sub">4</td><td class="c-fg">119</td><td class="c-sub">8</td><td>91.7</td><td>3.63</td><td>39.8%</td><td>0.390</td></tr>
+<tr><td class="c-rk">5</td><td class="c-name">Cole Ragans</td><td class="c-our">117.7</td><td class="c-sub">5</td><td class="c-fg">112</td><td class="c-sub">13</td><td>35.3</td><td>4.84</td><td>40.4%</td><td>0.457</td></tr>
+<tr><td class="c-rk">6</td><td class="c-name">Hogan Harris</td><td class="c-our">117.0</td><td class="c-sub">6</td><td class="c-fg">108</td><td class="c-sub">18</td><td>54.0</td><td>3.50</td><td>28.6%</td><td>0.313</td></tr>
+<tr><td class="c-rk">7</td><td class="c-name">Jacob deGrom</td><td class="c-our">116.9</td><td class="c-sub">7</td><td class="c-fg">107</td><td class="c-sub">22</td><td>120.7</td><td>3.95</td><td>41.9%</td><td>0.356</td></tr>
+<tr><td class="c-rk">8</td><td class="c-name">MacKenzie Gore</td><td class="c-our">116.6</td><td class="c-sub">8</td><td class="c-fg">91</td><td class="c-sub">88</td><td>139.7</td><td>4.45</td><td>42.9%</td><td>0.363</td></tr>
+<tr><td class="c-rk">9</td><td class="c-name">Brent Suter</td><td class="c-our">116.1</td><td class="c-sub">9</td><td class="c-fg">107</td><td class="c-sub">22</td><td>71.3</td><td>3.91</td><td>32.3%</td><td>0.319</td></tr>
+<tr><td class="c-rk">10</td><td class="c-name">Tanner Bibee</td><td class="c-our">116.0</td><td class="c-sub">10</td><td class="c-fg">122</td><td class="c-sub">6</td><td>150.3</td><td>4.01</td><td>33.7%</td><td>0.293</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+<section class="lb-panel" id="panel-SL" role="tabpanel" aria-labelledby="tab-SL" hidden>
+      <div class="lb-panel-head">
+        <h2>Slider <span class="lb-abbr">(SL)</span></h2>
+        <p class="lb-corr">Spearman ρ = 0.649 vs FanGraphs · n = 317 pitchers</p>
+      </div>
+      <div class="lb-scroll">
+      <table class="lb-table">
+        <thead>
+          <tr class="lb-grp">
+            <th></th><th></th>
+            <th colspan="2" class="grp-mine">My Stuff+ · 2025</th>
+            <th colspan="2" class="grp-fg">FanGraphs · 2025</th>
+            <th colspan="4" class="grp-perf">2026 season</th>
+          </tr>
+          <tr class="lb-sub">
+            <th class="c-rk">#</th><th class="c-name">Pitcher</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>IP</th><th>ERA</th><th>Wh%<span class="dag">†</span></th><th>xwOBAcon<span class="dag">†</span></th>
+          </tr>
+        </thead>
+        <tbody>
+<tr><td class="c-rk">1</td><td class="c-name">Ryan Yarbrough</td><td class="c-our">125.8</td><td class="c-sub">1</td><td class="c-fg">120</td><td class="c-sub">52</td><td>45.3</td><td>3.57</td><td>38.2%</td><td>0.127</td></tr>
+<tr><td class="c-rk">2</td><td class="c-name">Aroldis Chapman</td><td class="c-our">123.9</td><td class="c-sub">2</td><td class="c-fg">143</td><td class="c-sub">2</td><td>40.7</td><td>1.99</td><td>40.0%</td><td>0.244</td></tr>
+<tr><td class="c-rk">3</td><td class="c-name">Mason Miller</td><td class="c-our">123.2</td><td class="c-sub">3</td><td class="c-fg">137</td><td class="c-sub">5</td><td>51.3</td><td>0.88</td><td>53.8%</td><td>0.233</td></tr>
+<tr><td class="c-rk">4</td><td class="c-name">Josh Hader</td><td class="c-our">122.0</td><td class="c-sub">4</td><td class="c-fg">126</td><td class="c-sub">28</td><td>30.0</td><td>0.90</td><td>48.4%</td><td>0.296</td></tr>
+<tr><td class="c-rk">5</td><td class="c-name">Shawn Armstrong</td><td class="c-our">121.8</td><td class="c-sub">5</td><td class="c-fg">120</td><td class="c-sub">52</td><td>33.0</td><td>4.91</td><td>28.1%</td><td>0.180</td></tr>
+<tr><td class="c-rk">6</td><td class="c-name">Graham Ashcraft</td><td class="c-our">121.2</td><td class="c-sub">6</td><td class="c-fg">141</td><td class="c-sub">4</td><td>27.0</td><td>3.33</td><td>42.6%</td><td>0.325</td></tr>
+<tr><td class="c-rk">7</td><td class="c-name">Chase Burns</td><td class="c-our">120.7</td><td class="c-sub">7</td><td class="c-fg">126</td><td class="c-sub">28</td><td>131.0</td><td>2.47</td><td>50.1%</td><td>0.348</td></tr>
+<tr><td class="c-rk">8</td><td class="c-name">Blake Snell</td><td class="c-our">120.7</td><td class="c-sub">8</td><td class="c-fg">98</td><td class="c-sub">237</td><td>15.0</td><td>3.60</td><td>50.0%</td><td>0.553</td></tr>
+<tr><td class="c-rk">9</td><td class="c-name">Tyler Rogers</td><td class="c-our">120.4</td><td class="c-sub">9</td><td class="c-fg">132</td><td class="c-sub">8</td><td>57.3</td><td>1.57</td><td>20.7%</td><td>0.239</td></tr>
+<tr><td class="c-rk">10</td><td class="c-name">Trevor Rogers</td><td class="c-our">120.1</td><td class="c-sub">10</td><td class="c-fg">110</td><td class="c-sub">126</td><td>125.7</td><td>4.15</td><td>29.8%</td><td>0.295</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+<section class="lb-panel" id="panel-FS" role="tabpanel" aria-labelledby="tab-FS" hidden>
+      <div class="lb-panel-head">
+        <h2>Splitter <span class="lb-abbr">(FS)</span></h2>
+        <p class="lb-corr">Spearman ρ = 0.572 vs FanGraphs · n = 50 pitchers</p>
+      </div>
+      <div class="lb-scroll">
+      <table class="lb-table">
+        <thead>
+          <tr class="lb-grp">
+            <th></th><th></th>
+            <th colspan="2" class="grp-mine">My Stuff+ · 2025</th>
+            <th colspan="2" class="grp-fg">FanGraphs · 2025</th>
+            <th colspan="4" class="grp-perf">2026 season</th>
+          </tr>
+          <tr class="lb-sub">
+            <th class="c-rk">#</th><th class="c-name">Pitcher</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>Grade</th><th class="c-sub">Rk</th>
+            <th>IP</th><th>ERA</th><th>Wh%<span class="dag">†</span></th><th>xwOBAcon<span class="dag">†</span></th>
+          </tr>
+        </thead>
+        <tbody>
+<tr><td class="c-rk">1</td><td class="c-name">Jeremiah Estrada</td><td class="c-our">123.9</td><td class="c-sub">1</td><td class="c-fg">147</td><td class="c-sub">1</td><td>29.3</td><td>3.38</td><td>45.7%</td><td>0.364</td></tr>
+<tr><td class="c-rk">2</td><td class="c-name">Aroldis Chapman</td><td class="c-our">120.1</td><td class="c-sub">2</td><td class="c-fg">134</td><td class="c-sub">3</td><td>40.7</td><td>1.99</td><td>34.8%</td><td>0.301</td></tr>
+<tr><td class="c-rk">3</td><td class="c-name">Seranthony Domínguez</td><td class="c-our">119.1</td><td class="c-sub">3</td><td class="c-fg">115</td><td class="c-sub">7</td><td>43.0</td><td>4.60</td><td>57.5%</td><td>0.505</td></tr>
+<tr><td class="c-rk">4</td><td class="c-name">Roki Sasaki</td><td class="c-our">118.7</td><td class="c-sub">4</td><td class="c-fg">101</td><td class="c-sub">29</td><td>111.0</td><td>4.46</td><td>34.3%</td><td>0.324</td></tr>
+<tr><td class="c-rk">5</td><td class="c-name">Yoshinobu Yamamoto</td><td class="c-our">118.6</td><td class="c-sub">5</td><td class="c-fg">107</td><td class="c-sub">17</td><td>145.3</td><td>2.60</td><td>30.8%</td><td>0.268</td></tr>
+<tr><td class="c-rk">6</td><td class="c-name">Joe Ryan</td><td class="c-our">117.7</td><td class="c-sub">6</td><td class="c-fg">92</td><td class="c-sub">42</td><td>125.7</td><td>3.65</td><td>21.8%</td><td>0.321</td></tr>
+<tr><td class="c-rk">7</td><td class="c-name">Logan Gilbert</td><td class="c-our">117.3</td><td class="c-sub">7</td><td class="c-fg">136</td><td class="c-sub">2</td><td>145.3</td><td>3.28</td><td>40.1%</td><td>0.316</td></tr>
+<tr><td class="c-rk">8</td><td class="c-name">Yuki Matsui</td><td class="c-our">117.1</td><td class="c-sub">8</td><td class="c-fg">113</td><td class="c-sub">11</td><td>48.0</td><td>2.25</td><td>47.8%</td><td>0.307</td></tr>
+<tr><td class="c-rk">9</td><td class="c-name">Cade Smith</td><td class="c-our">116.9</td><td class="c-sub">9</td><td class="c-fg">114</td><td class="c-sub">9</td><td>55.0</td><td>2.29</td><td>42.7%</td><td>0.280</td></tr>
+<tr><td class="c-rk">10</td><td class="c-name">Zack Wheeler</td><td class="c-our">116.3</td><td class="c-sub">10</td><td class="c-fg">94</td><td class="c-sub">38</td><td>115.3</td><td>2.89</td><td>45.2%</td><td>0.336</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <p class="lb-legend">
+      <strong>Legend.</strong>
+      <code>My Stuff+</code> and <code>FanGraphs</code> grades are for the <strong>2025</strong> season (100 = league average; higher is better).
+      <code>Rk</code> = the pitcher's rank within that pitch type on each system.
+      The <strong>2026 season</strong> block — <code>IP</code>, <code>ERA</code>, whiff rate, and xwOBAcon (expected weighted on-base average on contact; lower is better for the pitcher) — is live-season performance, not an input to the grade.
+      <span class="dag">†</span> whiff rate and xwOBAcon are specific to that pitch type; IP and ERA are overall.
+      <br><br>
+      <strong>Coverage.</strong> This page currently shows <strong>4 of the model's 7 pitch types</strong> (Four-Seam, Changeup, Slider, Splitter) with the top 10 pitchers each, transcribed from the model's validation set. Sinker, Cutter, and Curveball to follow.
+    </p>
+
+    <footer class="lb-foot">
+      <div>Thomas Felton · Stuff+ pitch-quality model · Grades: 2025 · Performance: 2026 season · <a href="index.html">tdfelton.github.io</a></div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var tabs = Array.prototype.slice.call(document.querySelectorAll('.lb-tab'));
+      var panels = Array.prototype.slice.call(document.querySelectorAll('.lb-panel'));
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (t) { t.classList.remove('is-active'); t.setAttribute('aria-selected','false'); });
+          panels.forEach(function (p) { p.hidden = true; });
+          tab.classList.add('is-active'); tab.setAttribute('aria-selected','true');
+          var target = document.getElementById(tab.getAttribute('data-target'));
+          if (target) target.hidden = false;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
