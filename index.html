@@ -196,30 +196,33 @@
           <article class="project">
             <div class="project-head">
               <h3 class="project-title">MLB Pitch Quality (Stuff+) Evaluation System</h3>
-              <span class="badge badge-active">In progress</span>
+              <span class="badge badge-shipped">Phase 1 · Complete</span>
             </div>
-            <p class="project-tagline">Modeling pure stuff quality — independent of location — across 700K+ Statcast pitches.</p>
+            <p class="project-tagline">A physical-characteristics pitch-quality model — grading pure stuff independent of location, count, and batter handedness. 100 = MLB average.</p>
             <p class="prose">
-              Independently replicated and extended the FanGraphs Stuff+ methodology across two end-to-end
-              pipelines trained on 700K+ Statcast pitches (2015–2025): a cascaded ensemble
-              (Random Forest → contact classifier → LightGBM regressor) and a PyTorch MLP
-              (256→128→64, GELU, BatchNorm) that isolates pure stuff quality from 12 physical features
-              with no location confounders.
+              An independent Stuff+ model that grades a single pitch on its physical
+              characteristics alone — velocity, movement, spin, release, and approach angle — trained on
+              every MLB pitch since 2021 (Statcast / Hawk-Eye) and retrained through August 2026. Each of
+              seven pitch types gets its own paired sub-model: a three-class classifier estimating swing
+              outcome (whiff / foul / in-play) and an xwOBAcon regressor estimating contact quality on
+              balls in play. The two are combined into a single run-value score, with the whiff-versus-contact
+              weighting tunable to a club&apos;s philosophy — a contact-oriented staff can weight contact
+              suppression more heavily.
             </p>
             <p class="prose">
-              Applied per-pitch-type normalization (average = 100 per type), GroupKFold cross-validation
-              grouped by pitcher to prevent leakage, and a gradient-based stability regularizer
-              penalizing year-over-year inconsistency. Validated via Spearman correlation and quartile
-              persistence metrics. Deployed on W&amp;M&apos;s HPC cluster (Sciclone) via SLURM with
-              automated multi-year data ingestion, model serialization, and leaderboard generation.
+              Grades are placed on one pooled per-season scale so that 100 is major-league average across
+              all pitch types. The model shows strong convergent validity with FanGraphs&apos; Stuff+
+              (Spearman ρ ≈ 0.76 on four-seamers), is stable both year-over-year (≈0.78 season-to-season)
+              and within-season, and forecasts future run prevention on par with FanGraphs. It is built in
+              TrackMan-compatible conventions to extend to college data in a deferred Phase 2.
             </p>
             <ul class="tag-row" aria-label="Technologies">
-              <li>Python</li><li>PyTorch</li><li>LightGBM</li><li>scikit-learn</li>
-              <li>pybaseball</li><li>Statcast</li><li>SLURM</li>
+              <li>Python</li><li>scikit-learn</li><li>pybaseball</li><li>Statcast</li>
+              <li>Run-value modeling</li><li>xwOBA</li><li>SLURM</li>
             </ul>
             <p class="project-links">
-              <a href="https://github.com/TDFelton" target="_blank" rel="noopener">GitHub →</a>
-              <span class="muted">Repository under refinement</span>
+              <a href="https://claude.ai/code/artifact/d9210b57-7209-4619-9509-bc7abc8e9930" target="_blank" rel="noopener">View live leaderboard — 2025, vs FanGraphs →</a>
+              <span class="muted">Repository private — maintained for William &amp; Mary Baseball</span>
             </p>
           </article>
 
