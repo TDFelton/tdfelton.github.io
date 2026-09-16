@@ -193,36 +193,55 @@
         </div>
         <div class="col-body">
 
-          <article class="project">
+          <article class="project project-featured">
             <div class="project-head">
               <h3 class="project-title">MLB Pitch Quality (Stuff+) Evaluation System</h3>
-              <span class="badge badge-shipped">Phase 1 · Complete</span>
+              <span class="badge badge-featured">Featured</span>
             </div>
             <p class="project-tagline">A physical-characteristics pitch-quality model — grading pure stuff independent of location, count, and batter handedness. 100 = MLB average.</p>
             <p class="prose">
-              An independent Stuff+ model that grades a single pitch on its physical
-              characteristics alone — velocity, movement, spin, release, and approach angle — trained on
-              every MLB pitch since 2021 (Statcast / Hawk-Eye) and retrained through August 2026. Each of
-              seven pitch types gets its own paired sub-model: a three-class classifier estimating swing
-              outcome (whiff / foul / in-play) and an xwOBAcon regressor estimating contact quality on
-              balls in play. The two are combined into a single run-value score, with the whiff-versus-contact
-              weighting tunable to a club&apos;s philosophy — a contact-oriented staff can weight contact
-              suppression more heavily.
+              An independent reimplementation of Stuff+ that grades a single pitch on its physical
+              characteristics alone — velocity, spin rate and axis, induced vertical and horizontal break,
+              extension, release height and side, arm angle, and vertical/horizontal approach angle — plus
+              ten &ldquo;primary-pitch differentials&rdquo; measuring how each pitch diverges from that
+              pitcher&apos;s most-used offering that season. Location, count, batter handedness, and
+              seam-shifted wake are deliberately excluded: the first three aren&apos;t stuff, and the last
+              can&apos;t be computed on TrackMan, which keeps a future college port a recalibration rather
+              than a redesign. Trained on roughly 1.76 million MLB swings (Statcast, 2021–2026), each of the
+              seven pitch types gets its own paired sub-model — a three-class classifier for swing outcome
+              (whiff / foul / in-play) and an xwOBAcon regressor for contact quality — composed into a single
+              run-value grade scaled so that 100 is major-league average. Pitchers, never pitches, are split
+              80/20, so no arm appears on both sides of the wall.
             </p>
             <p class="prose">
-              Grades are placed on one pooled per-season scale so that 100 is major-league average across
-              all pitch types. The model shows strong convergent validity with FanGraphs&apos; Stuff+
-              (Spearman ρ ≈ 0.76 on four-seamers), is stable both year-over-year (≈0.78 season-to-season)
-              and within-season, and forecasts future run prevention on par with FanGraphs. It is built in
-              TrackMan-compatible conventions to extend to college data in a deferred Phase 2.
+              Nearly every structural choice replaced a simpler one that measured worse, and the dead ends
+              are documented as carefully as the wins. Seven independent models replaced a single shared one
+              after a per-type generalization gap appeared that tracked sample size almost exactly — the
+              49K-row splitter overfit by 0.117 log-loss while the 571K-row four-seamer overfit by 0.041, a
+              spread one shared complexity budget can&apos;t express. A contact-quality weight of 2.0 replaced
+              the unexamined default of 1.0 after a sweep against three independent criteria. Along the way a
+              two-stage classifier built to isolate the noisy &ldquo;foul&rdquo; class scored no better and was
+              scrapped; two of three candidate differentials degraded the model and were dropped; and a subtle
+              standardization bug — normalizing per pitch type instead of pooling — was caught only after it
+              had quietly made 912 of the 930 pitches ever graded above 135 cutters.
+            </p>
+            <p class="prose">
+              Because there is no ground truth for &ldquo;stuff,&rdquo; the model is validated on four separate
+              claims rather than one, every number computed from leakage-safe out-of-fold grades (5-fold
+              cross-validation grouped by pitcher). It agrees with FanGraphs&apos; Stuff+ at ρ = 0.697 across
+              3,096 pitcher-seasons, holds a pitcher&apos;s grade across adjacent seasons at r = 0.813, and
+              forecasts next-season ERA at r = −0.317 (innings-weighted) against a naive baseline&apos;s
+              +0.205 — roughly 1.6× better than the stat predicting itself. The less flattering result is
+              stated too: FanGraphs&apos; own Stuff+ still forecasts ERA slightly better (−0.358 vs −0.317),
+              though this model leads on whiff rate (+0.514 vs +0.355) and strikeout rate (+0.417 vs +0.390).
             </p>
             <ul class="tag-row" aria-label="Technologies">
-              <li>Python</li><li>scikit-learn</li><li>pybaseball</li><li>Statcast</li>
-              <li>Run-value modeling</li><li>xwOBA</li><li>SLURM</li>
+              <li>Python</li><li>LightGBM</li><li>Optuna</li><li>pybaseball</li><li>Statcast</li>
+              <li>Run-value modeling</li><li>xwOBA</li><li>Grouped cross-validation</li>
             </ul>
             <p class="project-links">
+              <a href="https://github.com/TDFelton/stuff_plus" target="_blank" rel="noopener">GitHub →</a>
               <a href="stuff-plus-leaderboard.html">Stuff+ leaderboards — 2025, vs FanGraphs →</a>
-              <span class="muted">Repository private — maintained for William &amp; Mary Baseball</span>
             </p>
           </article>
 
