@@ -483,6 +483,21 @@ a:focus-visible {
 .project:first-child { padding-top: 0; }
 .project:last-child { border-bottom: 0; padding-bottom: 0; }
 
+/* Featured (highlight) project */
+.project-featured {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--accent);
+  background: var(--paper-deep);
+  border-radius: 3px;
+  padding: 1.75rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+.project-featured.project:first-child { padding-top: 1.75rem; }
+.badge-featured {
+  background: var(--accent);
+  color: var(--paper);
+}
+
 .project-head {
   display: flex;
   align-items: baseline;
